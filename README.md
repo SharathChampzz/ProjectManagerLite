@@ -38,9 +38,9 @@ Scheduler: Configured to listen to emails every x minutes and send reminders eve
 ```git clone https://github.com/SharathChampzz/ProjectManagerLite.git```
 
 ### Handle Prerequisites
-Create sqlitedb and provide it in docker-compose.
-Create FTP Server Upload Location and provide it in docker-compose.
-Generate token JSON for Gmail API and place it in the emailservice folder.
+* Create sqlitedb and provide it in docker-compose.
+* Create FTP Server Upload Location and provide it in docker-compose.
+* Generate token JSON for Gmail API and place it in the emailservice folder.
 
 ### Build and Run the Project
 ```docker-compose build```
