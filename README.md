@@ -49,3 +49,18 @@ Scheduler: Configured to listen to emails every x minutes and send reminders eve
 
 # Conclusion
 ProjectManagerLite automates the follow-up tasks of project managers, ensuring developers are consistently reminded about their tasks. It is a comprehensive solution combining email automation, task management, and a user-friendly interface to enhance productivity.
+
+# Screenshots
+
+## Container:
+![image](https://github.com/user-attachments/assets/811b4517-4bab-40d5-af82-127ec715f967)
+
+## Task List:
+![image](https://github.com/user-attachments/assets/193eac5c-f5d6-45c7-a1a5-b3710b4d2efb)
+
+## APIs:
+![image](https://github.com/user-attachments/assets/aca8a9ba-1d43-40c4-8301-8503ac965b9d)
+
+## Reminder Email:
+![image](https://github.com/user-attachments/assets/d51bb9b5-0738-4e75-b630-aac8c7202791)
+
