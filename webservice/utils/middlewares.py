@@ -1,6 +1,5 @@
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.types import ASGIApp, Receive, Scope, Send
-from fastapi import FastAPI, Request
+from fastapi import Request
 import logging
 
 class LoggingMiddleware(BaseHTTPMiddleware):

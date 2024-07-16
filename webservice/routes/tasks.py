@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from utils import auth, crud, dependencies
 import schemas
-from fastapi.responses import FileResponse
 import os
 import logging
 import requests
@@ -169,7 +168,7 @@ def delete_task(task_id: int, db: Session = Depends(dependencies.get_db)):
         raise HTTPException(status_code=404, detail="Task not found")
     return {"detail": "Task deleted"}
 
-# Commented out as we are not storing the HTML content in the database
+# Commented out as downloading HTML files should be done via FTP server
 # @router.get("/tasks/{task_id}/html", dependencies=[Depends(auth.get_current_active_user)])
 # async def read_task_html(task_id: int, db: Session = Depends(dependencies.get_db)):
 #     """Retrieve the HTML content of a task."""

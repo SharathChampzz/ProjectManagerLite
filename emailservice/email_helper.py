@@ -15,7 +15,6 @@ from bs4 import BeautifulSoup
 
 # type hinting
 from typing import List, Dict, Any
-from datetime import datetime
 
 import logging
 
@@ -150,12 +149,6 @@ class EmailHelper():
                 to_address = self.extract_emails(next((header['value'] for header in headers if header['name'] == 'To'), ""))
                 cc_address = self.extract_emails(next((header['value'] for header in headers if header['name'] == 'Cc'), ""))
                 self.log.info(f'Subject: {subject}\nFrom: {from_address}\nTo: {to_address}\nCC: {cc_address}\nMessage ID: {message_id}\nThread ID: {thread_id}')
-
-
-                # # Extract name and email from the from_address
-                # parts = from_address.split("<")
-                # sender_name, sender_email = parts[0].strip().strip('"'), parts[1].strip()[:-1]
-                # self.log.info(f'Sender Name: {sender_name}, Sender Email: {sender_email}')
 
                 # Mark the message as read
                 self.mark_as_read(message_id)
@@ -364,11 +357,4 @@ class EmailHelper():
         return sent_message
 
 # # Usage example
-email_helper = EmailHelper(bot_email='spammingescape@gmail.com')
-# # emails = email_helper.fetch_unread_emails(download_email=True, max_results=1)
-# # self.log.info(emails)
-
-
-# current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-# reply_text = f"Thank you for your email. I will get back to you shortly. Click: http://localhost:3000/tasks/1. Next reply at: {current_time}"
-# email_helper.send_reply('190833d498493f68', reply_text)
+# email_helper = EmailHelper(bot_email='spammingescape@gmail.com')

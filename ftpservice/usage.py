@@ -6,7 +6,7 @@ def upload_file(file_path, upload_url):
     return response.json()
 
 if __name__ == "__main__":
-    file_path = r"S:\MyProjects\IssueTracker\webservice\uploads\19083322da77d879.html"
+    file_path = r"filename.html"
     upload_url = "http://localhost:8080/upload/"
     response = upload_file(file_path, upload_url)
     print(f"File uploaded to {response['file_url']}")

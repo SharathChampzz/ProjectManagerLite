@@ -17,18 +17,17 @@ Required Environment Variables:
 UPLOAD_DIRECTORY = os.getenv('UPLOAD_DIRECTORY')
 ALLOW_ORIGIN = os.getenv('ALLOW_ORIGIN')
 
-print(f"UPLOAD_DIRECTORY set to => {UPLOAD_DIRECTORY}")
-print(f"ALLOW_ORIGIN set to => {ALLOW_ORIGIN}")
-
 if not all([UPLOAD_DIRECTORY, ALLOW_ORIGIN]):
     print(help_str)
-    raise ValueError('Required environment variables are not set.')
+    raise ValueError(f'Required environment variables are not set. UPLOAD_DIRECTORY: {UPLOAD_DIRECTORY}, ALLOW_ORIGIN: {ALLOW_ORIGIN}')
+
+print(f"UPLOAD_DIRECTORY set to => {UPLOAD_DIRECTORY}")
+allowed_origin = ALLOW_ORIGIN.split(",")
+print(f"Allowed Origin set to => {allowed_origin}")
 
 ### Load Environment Variables - END ###
 
 app = FastAPI()
-allowed_origin = ALLOW_ORIGIN.split(",")
-print(f"Allowed Origin set to => {allowed_origin}")
 
 app.add_middleware(
     CORSMiddleware,
@@ -42,7 +41,8 @@ app.add_middleware(
 os.makedirs(UPLOAD_DIRECTORY, exist_ok=True)
 
 @app.post("/upload/")
-async def upload_file(file: UploadFile = File(...)):
+async def upload_file(file: UploadFile = File(...)) -> dict:
+    """Upload a file to the server"""
     file_location = Path(UPLOAD_DIRECTORY) / file.filename
     with open(file_location, "wb") as buffer:
         buffer.write(file.file.read())
@@ -50,13 +50,15 @@ async def upload_file(file: UploadFile = File(...)):
 
 # This is just a helper endpoint to see the uploaded files in the browser
 @app.get("/files/")
-async def list_files():
+async def list_files() -> HTMLResponse:
+    """List the files in the upload directory"""
     files = [f'<a href="/files/{file.name}" target="_blank">{file.name}</a><br>' for file in Path(UPLOAD_DIRECTORY).iterdir()]
     html_content = "\n".join(files)
     return HTMLResponse(content=html_content)
 
 @app.get("/files/{filename}")
-async def get_file(filename: str):
+async def get_file(filename: str) -> FileResponse:
+    """Download a file from the server"""
     file_path = Path(UPLOAD_DIRECTORY) / filename
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="File not found")

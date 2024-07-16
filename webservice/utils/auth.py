@@ -18,7 +18,8 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 # This will be used to protect the routes that require authentication.
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
+    """Create an access token with the data provided in the data parameter."""
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
@@ -29,9 +30,11 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 def get_user(db: Session, username: str) -> models.User:
+    """Get a user by their username."""
     return db.query(models.User).filter(models.User.username == username).first()
 
-def authenticate_user(db: Session, username: str, password: str):
+def authenticate_user(db: Session, username: str, password: str) -> models.User:
+    """Authenticate a user by their username and password."""
     user = get_user(db, username)
     if not user:
         return False
@@ -39,7 +42,8 @@ def authenticate_user(db: Session, username: str, password: str):
         return False
     return user
 
-def get_current_user(db: Session = Depends(dependencies.get_db), token: str = Depends(oauth2_scheme)):
+def get_current_user(db: Session = Depends(dependencies.get_db), token: str = Depends(oauth2_scheme)) -> models.User:
+    """Get the current user from the database using the token provided."""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -58,13 +62,13 @@ def get_current_user(db: Session = Depends(dependencies.get_db), token: str = De
         raise credentials_exception
     return user
 
-def get_current_active_user(current_user: schemas.User = Depends(get_current_user)):
+def get_current_active_user(current_user: schemas.User = Depends(get_current_user)) -> schemas.User:
     """Check if the user is active. If not, raise an HTTPException with status code 400 and detail Inactive user."""
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
-def get_current_active_superuser(current_user: schemas.User = Depends(get_current_user)):
+def get_current_active_superuser(current_user: schemas.User = Depends(get_current_user)) -> schemas.User:
     """Check if the user is a superuser. If not, raise an HTTPException with status code 400 and detail The user doesn't have enough privileges."""
     if not current_user.is_superuser:
         raise HTTPException(status_code=400, detail="The user doesn't have enough privileges")

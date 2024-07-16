@@ -19,13 +19,14 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 FTP_SERVER = os.getenv('FTP_SERVER')
 ALLOW_ORIGIN = os.getenv('ALLOW_ORIGIN')
 
+if not all([DATABASE_URL, FTP_SERVER, ALLOW_ORIGIN]):
+    print(help_str)
+    raise ValueError(f'Required environment variables are not set. DATABASE_URL: {DATABASE_URL}, FTP_SERVER: {FTP_SERVER}, ALLOW_ORIGIN: {ALLOW_ORIGIN}')
+
 print(f"DATABASE_URL set to => {DATABASE_URL}")
 print(f"FTP_SERVER set to => {FTP_SERVER}")
 print(f"ALLOW_ORIGIN set to => {ALLOW_ORIGIN}")
-
-if not all([DATABASE_URL, FTP_SERVER, ALLOW_ORIGIN]):
-    print(help_str)
-    raise ValueError('Required environment variables are not set.')
+allowed_origin = ALLOW_ORIGIN.split(",")
 
 ### Load Environment Variables - END ###
 
@@ -68,9 +69,6 @@ app = FastAPI(
     },
 )
 
-allowed_origin = ALLOW_ORIGIN.split(",")
-print(f"Allowed Origin set to => {allowed_origin}")
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origin,
@@ -89,6 +87,7 @@ app.include_router(users.router, prefix="/api/users", tags=["users"])
 
 @app.post("/token", response_model=schemas.Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(dependencies.get_db)):
+    """Get the access token for the user"""
     user = auth.authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
