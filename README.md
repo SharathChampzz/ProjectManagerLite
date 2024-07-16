@@ -58,6 +58,9 @@ ProjectManagerLite automates the follow-up tasks of project managers, ensuring d
 ## Task List:
 ![image](https://github.com/user-attachments/assets/193eac5c-f5d6-45c7-a1a5-b3710b4d2efb)
 
+## Show latest email content
+![image](https://github.com/user-attachments/assets/93bcaaf7-365e-4a79-a4b9-1c5acd85bf01)
+
 ## APIs:
 ![image](https://github.com/user-attachments/assets/aca8a9ba-1d43-40c4-8301-8503ac965b9d)
 
