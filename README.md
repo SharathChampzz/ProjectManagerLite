@@ -44,6 +44,7 @@ Scheduler: Configured to listen to emails every x minutes and send reminders eve
 
 ### Build and Run the Project
 ```docker-compose build```
+
 ```docker-compose up```
 
 # Conclusion
