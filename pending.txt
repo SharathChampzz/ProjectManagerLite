@@ -1,0 +1,183 @@
+
+# Have common file upload function use async await
+# read allowed origin from env
+# Update email html to make to look nice
+
+Steps:
+Prerequisites: 
+Generate token.json and place it under emailservice
+Have SQLite.db and place it under webservice
+Have an empty folder called: "uploads" under webservice to store Uploaded files
+Set .env values under emailservice and uiservice
+
+Change Background Colour for reply message
+
+TODO:
+Instead of .env > Update docker-compose > To keep everything at one place
+Remove full mounts once all the dev tasks are done
+For react app deployment use, nginx
+
+Add Logout Option
+email processing scheduler to check emails and post task
+API to set history - send for reminders
+Decide intervals for sending reminders based on criticality
+email reminder scheduler to get all open issues -> check last reminder time and map it with criticality -> Based on that send reminder
+email reminder scheduler to get all fixed issues -> check last reminder time and if it is exceeded 24 hours -> Based on that send reminder
+Add unit testing for each services
+
+
+Use Email Instead of username everywhere - UI can split and show only username - This will have some advantage like org separation in future,common username avoid
+Get Azure Blob Storage - 100 MB is sufficient - Upload and retrieve html from there -- or check if Google Drive is feasible.
+Add organization split support - meaning tasks should be returned of only current users organization - filter based on smtp.
+Change password screen
+
+#4. Add breadcrumbs on each page for easy navigation
+
+Done:
+#1. Creator user if doesnot exists during issue creation
+#2. task should store the id of the user instead of usernames for creator and assigner_name -- Proceeding with ID and added this as foreign key for autoupdate
+#3. API to download requested html file
+reattempt to store user id - even if trigger didnt work thats fine.
+
+Open:
+Update GET API - To support query params for columns
+
+Done:
+#1. Add Upload HTML File Support
+#2. Use Enums for criticality and status
+
+UI Task:
+#1. Sign Up Page: 
+    POST: /api/users/signup 
+    Request Body: 
+    {
+    "username": "string",
+    "password": "string"
+    }
+    Expected Result: On Successfull => Redirect to Login Page
+
+#2. Login page:
+    POST: /token
+    Form Data: username and password
+    Successfull Response:
+    {
+    "access_token": "string",
+    "token_type": "string",
+    "user": {
+        "id": 0,
+        "username": "string",
+        "is_active": true,
+        "is_superuser": true,
+        "role": "string"
+    }
+    }
+
+    Expected Behaviour: 
+    Post Successfull login redirect to /issues page and store the user props efficiently like a prod env, We will need it later
+    API response will also set cookies. Send it in all the upcoming requests.
+    Also send Authorization header: Bearer ****. Send it in all the upcoming requests.
+
+#3. Issues Listing Page: /issues
+    #3.a : Filtering
+        React grid page that lists the issues. API to fetch: /api/tasks
+
+        Possible Filters: /api/tasks/?skip=0&limit=100&creator_name=hello&assigner_name=hello&subject_contains=hello&criticality=hello&status=hello&thread_id=hello
+            
+            skip: int = 0,
+            limit: int = 100,
+            creator_name: str = None,
+            assigner_name: str = None,
+            subject_contains: str = None,
+            criticality: str = None,
+            status: str = None,
+            thread_id: str = None,
+
+        Pagination should use skip and limit
+        dropdown on grid to filter: criticality and status
+        other columns should have column based filter (creator_name, assigner_name, thread_id) => The available values should be populated based on what grid currently holds and it should also show the values from next page if pagination is used.
+        Search on grid should search for subject
+
+        Supported Values for criticality and status:
+        class TaskStatus(str, Enum):
+            OPEN = "OPEN"
+            FIXED = "FIXED"
+            CLOSED = "CLOSED"
+            
+        class TaskCriticality(str, Enum):
+            LOW = "LOW"
+            MEDIUM = "MEDIUM"
+            HIGH = "HIGH"
+            CRITICAL = "CRITICAL"
+
+    #3b. Links generation
+        For each of the task we receive in the response. We need to build a clickable url, On clicking open the url in new tab. (/tasks/{task_id})
+
+    #3c. Clickable restriction
+        When we logged in, we have stored user properties like is_active, is_superuser. Clicks should be clickable only if user is_active
+
+    #3d. Create task option on top of the grid. That should open up a form and handle post for the below form data
+        POST /api/tasks
+        FastAPI Backend Code:
+        async def create_task(
+            creator_name: str = Form(...),
+            assigner_name: str = Form(...),
+            subject: str = Form(...),
+            criticality: schemas.TaskCriticality = Form(...),
+            status: schemas.TaskStatus = Form(...),
+            thread_id: str = Form(...),
+            html_file: UploadFile = File(...),
+            db: Session = Depends(dependencies.get_db)
+        ):
+
+#4. Task Details Page: API to use: GET /api/tasks/{task_id}
+    Response:
+        {
+            "creator_name": "string",
+            "assigner_name": "string",
+            "subject": "string",
+            "criticality": "LOW",
+            "status": "OPEN",
+            "html_file": "string",
+            "thread_id": "string",
+            "id": 0,
+            "created_time": "2024-07-01T04:32:36.578Z"
+        }
+    
+    #4a. This page should show the details of task in nice UI.
+
+    #4b: Edits
+        API to perform Edit: PUT /api/tasks/{task_id}
+
+        View Only:
+            creator_name
+            created_time
+
+        hidden:
+            id (show only in url) not on page
+            thread_id
+
+        Eye View Icon:
+            html_file edit is not supported and it should have view icon
+
+        Populate Values for Edit:
+            For criticality and status: Use Enum class
+            For subject: Editable text on clicking edit icon
+            For assigner_name: Make API call GET /api/users. Populate dropdown list with usernames. Make sure to show loading bar during fetch.
+                Response:
+                    [
+                        {
+                            "id": 0,
+                            "username": "string",
+                            "is_active": true,
+                            "is_superuser": true,
+                            "role": "string"
+                        }
+                    ]
+        
+    #4c:
+        html_file is view only => On clicking view icon => send request to get html file and open dialog and show html content.
+        API get GET /html/{filename} => API not implemented yet
+
+    #4d:
+        If user is_superuser (read for storage), show delete option and delete task
+        API: DELETE /api/tasks/{task_id}

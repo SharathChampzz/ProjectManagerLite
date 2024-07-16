@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  webservice:
+    build:
+      context: ./webservice
+      dockerfile: Dockerfile
+      args:
+        - SKIP_PYCACHE=1
+        - SKIP_VENV=1
+    container_name: webservice
+    environment:
+      - FTP_SERVER=http://ftpservice:8080
+      - DATABASE_URL=sqlite:///../IssueTracker.db
+      - ALLOW_ORIGIN=http://localhost,http://emailservice,http://uiservice,http://localhost:3000
+    volumes:
+      - ./IssueTracker.db:/IssueTracker.db
+      # - ./webservice:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - ftpservice
+
+  ftpservice:
+    build:
+      context: ./ftpservice
+      dockerfile: Dockerfile
+      args:
+        - SKIP_PYCACHE=1
+        - SKIP_VENV=1
+    container_name: ftpservice
+    environment:
+      - UPLOAD_DIRECTORY=/FTPServerUploadLocation
+      - ALLOW_ORIGIN=http://localhost,http://webservice,http://uiservice,http://localhost:3000
+    volumes:
+      - ./FTPServerUploadLocation:/FTPServerUploadLocation
+      # - ./ftpservice:/app
+    ports:
+      - "8080:8080"
+
+  emailservice:
+    build:
+      context: ./emailservice
+      dockerfile: Dockerfile
+      args:
+        - SKIP_PYCACHE=1
+        - SKIP_VENV=1
+    container_name: emailservice
+    environment:
+      - API_BASE_URL=http://webservice:8000
+      - UI_BASE_URL=http://localhost:3000
+      - USER_NAME=testsuperuser@gmail.com # This account is used to authenticate the web service and create tasks
+      - PASSWORD=testsuperuser
+      - BOT_EMAIL=spammingescape@gmail.com # This email is used to send reminder emails
+      - EMAIL_PARSE_INTERVAL=3
+      - SEND_REMINDER_INTERVAL=30
+      - REMINDER_INTERVAL_FOR_CRITICAL=0.05
+      - REMINDER_INTERVAL_FOR_HIGH=10
+      - REMINDER_INTERVAL_FOR_MEDIUM=24
+      - REMINDER_INTERVAL_FOR_LOW=48
+    volumes:
+      - ./emailservice/token.json:/app/token.json
+      # - ./emailservice:/app
+    depends_on:
+      - webservice
+
+  uiservice:
+    build:
+      context: ./uiservice
+      dockerfile: Dockerfile
+    container_name: uiservice
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_WEBSERVICE_URL=http://localhost:8000
+      - REACT_APP_FTP_SERVER_URL=http://localhost:8080
+    # volumes:
+    #   - ./uiservice:/app
+    depends_on:
+      - webservice

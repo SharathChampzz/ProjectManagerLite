@@ -1,0 +1,31 @@
+# Ignore Virtual Environment
+backendenv
+pyenv
+emailenv
+websvcenv
+ftpsvc
+*.pyc
+*.env
+
+# Ignore Log Files:
+*.log
+
+# Ignore credential files
+credentials.json
+token.json
+
+# Ignore test files
+dev_integeration
+test_*.py
+
+# Ignore Downloads DIR
+downloads
+
+# Ignore Uploads DIR
+uploads
+FTPServerUploadLocation
+
+# Ignore Frontend related files
+node_modules
+
+*.db

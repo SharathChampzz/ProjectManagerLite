@@ -1,0 +1,8 @@
+
+
+Docker Used Commands:
+docker-compose build
+docker-compose up
+docker-compose up --force-recreate
+
+Note: To avoid rebuilding the images again and again after code change. Mount the volume in docker-compose file

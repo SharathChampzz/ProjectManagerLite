@@ -1,0 +1,4 @@
+__pycache__/
+ftpsvc/
+.env
+*.pyc

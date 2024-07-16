@@ -1,0 +1,8 @@
+__pycache__/
+downloads/
+emailenv/
+LogFiles/
+*.env
+*.pyc
+*.pyo
+*.pyd
